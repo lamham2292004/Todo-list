@@ -2,6 +2,7 @@ package com.app.todolist.controller;
 
 import com.app.todolist.dto.request.TaskCreateRequest;
 import com.app.todolist.dto.request.TaskUpdateRequest;
+import com.app.todolist.dto.response.TaskResponse;
 import com.app.todolist.entity.Task;
 import com.app.todolist.service.TodoService;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class TaskController {
     }
 
     @PostMapping
-    public Task createTask(@RequestBody TaskCreateRequest request) {
+    public TaskResponse createTask(@RequestBody TaskCreateRequest request) {
         return todoService.createTodo(request);
     }
 
@@ -28,14 +29,14 @@ public class TaskController {
         return todoService.getAllTasks();
     }
 
-    @PutMapping("/{id}")
-    public Task updateTask(@PathVariable long id,@RequestBody TaskUpdateRequest request) {
-        return todoService.updateTodo(id,request);
+    @PutMapping("/{todoId}")
+    public TaskResponse updateTask(@PathVariable long todoId,@RequestBody TaskUpdateRequest request) {
+        return todoService.updateTodo(todoId,request);
     }
 
-    @DeleteMapping("/{id}")
-    String deleteTask(@PathVariable long id) {
-        todoService.deleteTodo(id);
+    @DeleteMapping("/{todoId}")
+    String deleteTask(@PathVariable long todoId) {
+        todoService.deleteTodo(todoId);
         return "xoa thanh cong ";
     }
 }

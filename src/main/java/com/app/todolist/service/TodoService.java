@@ -4,45 +4,40 @@ import com.app.todolist.dto.request.TaskCreateRequest;
 import com.app.todolist.dto.request.TaskUpdateRequest;
 import com.app.todolist.dto.response.TaskResponse;
 import com.app.todolist.entity.Task;
+import com.app.todolist.mapper.TaskMapper;
 import com.app.todolist.repository.TaskRepository;
+import lombok.AccessLevel;
+
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TodoService {
-    private final TaskRepository taskRepository;
+        TaskRepository taskRepository;
 
-    public TodoService(TaskRepository taskRepository) {
-        this.taskRepository = taskRepository;
-    }
+        TaskMapper taskMapper;
 
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
     }
 
-    public Task createTodo(TaskCreateRequest request) {
-        Task task = new Task();
+    public TaskResponse createTodo(TaskCreateRequest request) {
+        Task task = taskMapper.toTaskMapper(request);
 
-        task.setTitle(request.getTitle());
-        task.setCompleted(false);
-
-        return taskRepository.save(task);
+        return taskMapper.toTaskResponse(taskRepository.save(task));
     }
 
-    public Task updateTodo(Long taskid, TaskUpdateRequest request) {
-        Optional<Task> optionalTask = taskRepository.findById(taskid);
+    public TaskResponse updateTodo(Long taskId, TaskUpdateRequest request) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(()-> new RuntimeException("Task not found"));
 
-        if (!optionalTask.isPresent()) {
-            throw new RuntimeException("Task not found with id: " + taskid);
-        }
+        taskMapper.updateTask(task,request);
 
-        Task task = optionalTask.get();
-
-        task.setTitle(request.getTitle());
-        task.setCompleted(false);
-
-        return taskRepository.save(task);
+        return taskMapper.toTaskResponse(taskRepository.save(task));
     }
 
 
